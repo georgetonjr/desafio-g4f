@@ -1,0 +1,288 @@
+.pagina {
+  display: flex;
+  min-height: 100vh;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 64px 24px;
+  background-color: #f4f5f7;
+}
+
+.cartao {
+  width: 100%;
+  max-width: 640px;
+  padding: 32px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.titulo {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.subtitulo {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.formulario,
+.formularioBusca {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.rotulo {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.linhaFormulario {
+  display: flex;
+  gap: 12px;
+}
+
+.campo,
+.area {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #111827;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.linhaFormulario .campo {
+  flex: 1;
+}
+
+.area {
+  height: auto;
+  min-height: 88px;
+  padding: 10px 14px;
+  resize: vertical;
+}
+
+.campo:focus,
+.area:focus {
+  border-color: #2563eb;
+}
+
+.acoesFormulario {
+  display: flex;
+  gap: 12px;
+}
+
+.botao {
+  height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2563eb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.botao:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.botao:not(:disabled):hover {
+  background-color: #1d4ed8;
+}
+
+.botaoSecundario {
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.botaoSecundario:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.botaoSecundario:not(:disabled):hover {
+  background-color: #f3f4f6;
+}
+
+.botaoPerigo {
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #b91c1c;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.botaoPerigo:disabled {
+  color: #9ca3af;
+  border-color: #d1d5db;
+  cursor: not-allowed;
+}
+
+.botaoPerigo:not(:disabled):hover {
+  background-color: #fef2f2;
+}
+
+.carregando {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #d1d5db;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: girar 0.6s linear infinite;
+}
+
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.mensagemErro {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.vazio {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.lista {
+  list-style: none;
+  margin: 24px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+}
+
+.itemConteudo {
+  min-width: 0;
+}
+
+.itemTitulo {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.itemDescricao {
+  margin: 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.itemAcoes {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.infoPaginacao {
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .pagina {
+    padding: 32px 16px;
+  }
+
+  .cartao {
+    padding: 24px;
+  }
+
+  .titulo {
+    font-size: 24px;
+  }
+
+  .linhaFormulario {
+    flex-direction: column;
+  }
+
+  .item {
+    flex-direction: column;
+  }
+
+  .paginacao {
+    flex-direction: column;
+  }
+
+  .botao,
+  .botaoSecundario,
+  .botaoPerigo {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .cartao {
+    max-width: 720px;
+    padding: 40px;
+  }
+}

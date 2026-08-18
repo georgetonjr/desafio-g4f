@@ -9,6 +9,8 @@ RUN pnpm install --frozen-lockfile
 FROM node:22-alpine AS build
 WORKDIR /repo
 RUN corepack enable
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 COPY --from=deps /repo/node_modules ./node_modules
 COPY --from=deps /repo/apps/frontend/node_modules ./apps/frontend/node_modules
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./

@@ -37,9 +37,9 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:9000/api
     restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_URL: http://localhost:9000/api
     ports:
       - '3000:3000'
     depends_on:
