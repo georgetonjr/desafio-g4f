@@ -11,6 +11,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ZodValidationPipe());
+  app.enableCors();
 
   const swaggerDocument = cleanupOpenApiDoc(
     SwaggerModule.createDocument(app, swaggerConfig),

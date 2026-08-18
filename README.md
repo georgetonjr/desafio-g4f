@@ -72,7 +72,13 @@ pnpm --filter backend run migration:run
 pnpm --filter backend run seed:noticia
 ```
 
-6. Suba backend e frontend juntos:
+6. (Opcional) Configure a URL da API consumida pelo frontend. Por padrão ele já aponta para `http://localhost:9000/api`; para customizar, copie o exemplo e ajuste `NEXT_PUBLIC_API_URL`:
+
+```bash
+cp apps/frontend/.env.example apps/frontend/.env
+```
+
+7. Suba backend e frontend juntos:
 
 ```bash
 pnpm dev
@@ -117,6 +123,10 @@ Resposta:
 
 A listagem mantém um cache em memória por 30 segundos, chaveado pela combinação `pagina`/`limite`/`busca`. O cache é invalidado automaticamente sempre que uma notícia é criada, atualizada ou removida, evitando dados desatualizados.
 
+### Página de notícias no frontend
+
+A rota `/noticias` consome o CRUD acima: formulário de criação/edição, listagem paginada com busca e ações de editar/remover por item. A URL da API é configurável via `NEXT_PUBLIC_API_URL` (ver passo 6 da seção anterior); sem essa variável, o frontend usa `http://localhost:9000/api` como padrão. O backend habilita CORS (`app.enableCors()` em `main.ts`) para aceitar essas requisições vindas de outra origem (`http://localhost:3000`).
+
 ## Setup e execução via Docker
 
 Com o arquivo `apps/backend/.env` já configurado (passo 2 acima), suba toda a stack (banco, backend e frontend) a partir da raiz do repositório. O `--env-file` é necessário para que o Compose resolva as variáveis (`DB_USER`, `DB_PASSWORD`, etc.) usadas no `docker-compose.yml` raiz:
@@ -129,7 +139,7 @@ Isso inicia:
 
 - `db`: PostgreSQL 16, com healthcheck para garantir que o backend só suba depois do banco estar pronto.
 - `backend`: API NestJS, acessível em http://localhost:9000/api e com Swagger em http://localhost:9000/docs. As migrations rodam automaticamente ao iniciar (comportamento padrão em `NODE_ENV=dev`).
-- `frontend`: aplicação Next.js, acessível em http://localhost:3000.
+- `frontend`: aplicação Next.js, acessível em http://localhost:3000. O `docker-compose.yml` já passa `NEXT_PUBLIC_API_URL=http://localhost:9000/api` como build arg do serviço, apontando para o backend do próprio compose (variáveis `NEXT_PUBLIC_*` do Next.js são embutidas no bundle em tempo de build, por isso vão como `args` do build e não como `environment` de runtime).
 
 Para parar os containers:
 
@@ -166,6 +176,8 @@ pnpm --filter frontend test:watch  # modo watch
 pnpm test
 ```
 
+`apps/backend/test/noticia.e2e-spec.ts` e `apps/frontend/src/app/busca-cep/page.test.tsx` seguem estrutura BDD: cenários nomeados no formato "dado X, quando Y, então Z", com o corpo do teste organizado em blocos Given/When/Then (ou Dado/Quando/Então).
+
 ## Lint e formatação
 
 ```bash
@@ -174,3 +186,5 @@ pnpm lint:check     # apenas verifica
 pnpm format         # formata o código
 pnpm format:check   # apenas verifica formatação
 ```
+
+**Por que esses padrões?** ESLint e Prettier são integrados via `eslint-plugin-prettier`, de forma que um único comando (`lint`) cobre tanto regras de qualidade de código quanto formatação, evitando divergência entre o que o linter aceita e o que o formatter reescreve. `singleQuote: true` e `trailingComma: "all"` (`.prettierrc` de cada app) seguem o padrão mais comum no ecossistema TypeScript/Next.js e minimizam diffs em revisões: manter vírgula final em listas multi-linha evita que adicionar um item mude a linha anterior no diff.
