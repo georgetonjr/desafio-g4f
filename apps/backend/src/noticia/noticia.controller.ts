@@ -31,7 +31,7 @@ export class NoticiaController {
   @Post()
   @ApiOperation({ summary: 'Cria uma notícia' })
   @ZodResponse({ status: HttpStatus.CREATED, type: NoticiaResponseDto })
-  criar(@Body() dto: CreateNoticiaDto) {
+  async criar(@Body() dto: CreateNoticiaDto) {
     return this.noticiaService.criar(dto);
   }
 
@@ -54,7 +54,7 @@ export class NoticiaController {
   @ApiOperation({ summary: 'Atualiza uma notícia' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ZodResponse({ status: HttpStatus.OK, type: NoticiaResponseDto })
-  atualizar(
+  async atualizar(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateNoticiaDto,
   ) {
