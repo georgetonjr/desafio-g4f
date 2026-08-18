@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Cache Next.js build cache
+        uses: actions/cache@v4
+        with:
+          path: apps/frontend/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/frontend/**/*.[jt]s', 'apps/frontend/**/*.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Lint
+        run: pnpm run lint:check
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Test
+        run: pnpm run test
+
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Cache TypeScript incremental build
+        uses: actions/cache@v4
+        with:
+          path: apps/backend/dist
+          key: ${{ runner.os }}-backend-tsc-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('apps/backend/src/**/*.ts', 'apps/backend/tsconfig*.json') }}
+          restore-keys: |
+            ${{ runner.os }}-backend-tsc-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Lint
+        run: pnpm run lint:check
+
+      - name: Format check
+        run: pnpm run format:check
+
+      - name: Test
+        run: pnpm run test
