@@ -1,0 +1,21 @@
+{
+  "name": "desafio-g4f",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter frontend dev\" \"pnpm --filter backend start:dev\"",
+    "lint": "pnpm --filter frontend lint && pnpm --filter backend lint",
+    "lint:check": "pnpm --filter frontend lint:check && pnpm --filter backend lint:check",
+    "format": "pnpm --filter frontend format && pnpm --filter backend format",
+    "format:check": "pnpm --filter frontend format:check && pnpm --filter backend format:check",
+    "test": "pnpm --filter frontend test && pnpm --filter backend test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.32.1",
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
