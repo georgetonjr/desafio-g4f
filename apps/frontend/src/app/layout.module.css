@@ -1,0 +1,17 @@
+.navegacao {
+  display: flex;
+  gap: 20px;
+  padding: 16px 24px;
+  background-color: #111827;
+}
+
+.link {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e5e7eb;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: #ffffff;
+}
