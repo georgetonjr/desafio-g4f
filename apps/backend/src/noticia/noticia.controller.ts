@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiNoContentResponse,
@@ -22,6 +23,8 @@ import { NoticiaService } from './noticia.service';
 import { CreateNoticiaDto } from './schemas/create-noticia.schema';
 import { UpdateNoticiaDto } from './schemas/update-noticia.schema';
 import { NoticiaResponseDto } from './schemas/noticia-response.schema';
+import { ListarNoticiasQueryDto } from './schemas/listar-noticias-query.schema';
+import { NoticiaPaginadaResponseDto } from './schemas/noticia-paginada-response.schema';
 
 @ApiTags('Noticias')
 @Controller('noticias')
@@ -31,15 +34,15 @@ export class NoticiaController {
   @Post()
   @ApiOperation({ summary: 'Cria uma notícia' })
   @ZodResponse({ status: HttpStatus.CREATED, type: NoticiaResponseDto })
-  criar(@Body() dto: CreateNoticiaDto) {
+  async criar(@Body() dto: CreateNoticiaDto) {
     return this.noticiaService.criar(dto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lista todas as notícias' })
-  @ApiOkResponse({ type: [NoticiaResponseDto] })
-  listarTodas() {
-    return this.noticiaService.listarTodas();
+  @ApiOperation({ summary: 'Lista notícias com paginação e filtro' })
+  @ZodResponse({ status: HttpStatus.OK, type: NoticiaPaginadaResponseDto })
+  listar(@Query() query: ListarNoticiasQueryDto) {
+    return this.noticiaService.listar(query);
   }
 
   @Get(':id')
@@ -54,7 +57,7 @@ export class NoticiaController {
   @ApiOperation({ summary: 'Atualiza uma notícia' })
   @ApiParam({ name: 'id', format: 'uuid' })
   @ZodResponse({ status: HttpStatus.OK, type: NoticiaResponseDto })
-  atualizar(
+  async atualizar(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() dto: UpdateNoticiaDto,
   ) {

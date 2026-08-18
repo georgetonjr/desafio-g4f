@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Noticia } from './noticia.entity';
 import { NoticiaController } from './noticia.controller';
 import { NoticiaService } from './noticia.service';
+import { NoticiaCacheService } from './cache/noticia-cache.service';
 import { NOTICIA_REPOSITORY } from './repository/noticia.repository.interface';
 import { NoticiaTypeOrmRepository } from './repository/noticia.typeorm-repository';
 
@@ -11,6 +12,7 @@ import { NoticiaTypeOrmRepository } from './repository/noticia.typeorm-repositor
   controllers: [NoticiaController],
   providers: [
     NoticiaService,
+    NoticiaCacheService,
     { provide: NOTICIA_REPOSITORY, useClass: NoticiaTypeOrmRepository },
   ],
 })
