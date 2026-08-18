@@ -7,9 +7,20 @@ export type NoticiaInput = {
   descricao: string;
 };
 
+export type ListarNoticiasInput = {
+  pagina: number;
+  limite: number;
+  busca?: string;
+};
+
+export type NoticiaPaginada = {
+  itens: Noticia[];
+  total: number;
+};
+
 export interface NoticiaRepository {
   criar(dados: NoticiaInput): Promise<Noticia>;
-  listarTodas(): Promise<Array<Noticia>>;
+  listar(dados: ListarNoticiasInput): Promise<NoticiaPaginada>;
   buscarPorId(id: string): Promise<Noticia | null>;
   atualizar(id: string, dados: Partial<NoticiaInput>): Promise<Noticia | null>;
   remover(id: string): Promise<boolean>;

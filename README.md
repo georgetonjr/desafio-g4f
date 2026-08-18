@@ -91,6 +91,32 @@ pnpm --filter frontend dev
 - Documentação Swagger: http://localhost:9000/docs
 - Frontend: http://localhost:3000
 
+## Listagem de notícias (paginação, filtro e cache)
+
+`GET /api/noticias` aceita os parâmetros de query:
+
+- `pagina`: página desejada (padrão `1`).
+- `limite`: quantidade de itens por página, de 1 a 100 (padrão `10`).
+- `busca`: filtra notícias cujo `titulo` ou `descricao` contenham o termo informado.
+
+```bash
+curl "http://localhost:9000/api/noticias?pagina=1&limite=10&busca=eleições"
+```
+
+Resposta:
+
+```json
+{
+  "itens": [{ "id": "...", "titulo": "...", "descricao": "...", "criadoEm": "...", "atualizadoEm": "..." }],
+  "total": 42,
+  "pagina": 1,
+  "limite": 10,
+  "totalPaginas": 5
+}
+```
+
+A listagem mantém um cache em memória por 30 segundos, chaveado pela combinação `pagina`/`limite`/`busca`. O cache é invalidado automaticamente sempre que uma notícia é criada, atualizada ou removida, evitando dados desatualizados.
+
 ## Setup e execução via Docker
 
 Com o arquivo `apps/backend/.env` já configurado (passo 2 acima), suba toda a stack (banco, backend e frontend) a partir da raiz do repositório. O `--env-file` é necessário para que o Compose resolva as variáveis (`DB_USER`, `DB_PASSWORD`, etc.) usadas no `docker-compose.yml` raiz:

@@ -14,7 +14,15 @@ interface NoticiaResponseBody {
   descricao: string;
 }
 
-describe('POST /noticias', () => {
+interface NoticiaPaginadaResponseBody {
+  itens: NoticiaResponseBody[];
+  total: number;
+  pagina: number;
+  limite: number;
+  totalPaginas: number;
+}
+
+describe('NoticiaController (e2e)', () => {
   let container: StartedPostgreSqlContainer;
   let app: INestApplication<App>;
 
@@ -47,41 +55,95 @@ describe('POST /noticias', () => {
     await container.stop();
   });
 
-  it('dado um payload válido, quando POST /noticias, então retorna 201 com a notícia criada', async () => {
-    // Given
-    const payload = {
-      titulo: 'Título de teste',
-      descricao: 'Descrição de teste',
-    };
+  describe('POST /noticias', () => {
+    it('dado um payload válido, quando POST /noticias, então retorna 201 com a notícia criada', async () => {
+      // Given
+      const payload = {
+        titulo: 'Título de teste',
+        descricao: 'Descrição de teste',
+      };
 
-    // When
-    const response = await request(app.getHttpServer())
-      .post('/api/noticias')
-      .send(payload);
+      // When
+      const response = await request(app.getHttpServer())
+        .post('/api/noticias')
+        .send(payload);
 
-    // Then
-    const body = response.body as NoticiaResponseBody;
-    expect(response.status).toBe(201);
-    expect(body).toMatchObject(payload);
-    expect(body.id).toBeDefined();
+      // Then
+      const body = response.body as NoticiaResponseBody;
+      expect(response.status).toBe(201);
+      expect(body).toMatchObject(payload);
+      expect(body.id).toBeDefined();
+    });
+
+    it('dado um payload inválido, quando POST /noticias, então retorna 400 e nenhuma notícia é persistida', async () => {
+      // Given
+      const payloadInvalido = { descricao: 'Notícia sem título obrigatório' };
+
+      // When
+      const responseInvalida = await request(app.getHttpServer())
+        .post('/api/noticias')
+        .send(payloadInvalido);
+
+      // Then
+      expect(responseInvalida.status).toBe(400);
+
+      const listagem = await request(app.getHttpServer()).get(
+        '/api/noticias?limite=100',
+      );
+      const body = listagem.body as NoticiaPaginadaResponseBody;
+      const encontrada = body.itens.find(
+        (noticia) => noticia.descricao === 'Notícia sem título obrigatório',
+      );
+      expect(encontrada).toBeUndefined();
+    });
   });
 
-  it('dado um payload inválido, quando POST /noticias, então retorna 400 e nenhuma notícia é persistida', async () => {
-    // Given
-    const payloadInvalido = { descricao: 'Notícia sem título obrigatório' };
+  describe('GET /noticias', () => {
+    beforeAll(async () => {
+      await request(app.getHttpServer())
+        .post('/api/noticias')
+        .send({ titulo: 'Eleições municipais', descricao: 'Cobertura local' });
+      await request(app.getHttpServer()).post('/api/noticias').send({
+        titulo: 'Copa do mundo',
+        descricao: 'Resultado das eleições',
+      });
+      await request(app.getHttpServer())
+        .post('/api/noticias')
+        .send({ titulo: 'Clima hoje', descricao: 'Previsão do tempo' });
+    });
 
-    // When
-    const responseInvalida = await request(app.getHttpServer())
-      .post('/api/noticias')
-      .send(payloadInvalido);
+    it('dado o limite informado, quando GET /noticias, então retorna a quantidade de itens e os metadados corretos', async () => {
+      // When
+      const response = await request(app.getHttpServer()).get(
+        '/api/noticias?pagina=1&limite=2',
+      );
 
-    // Then
-    expect(responseInvalida.status).toBe(400);
+      // Then
+      const body = response.body as NoticiaPaginadaResponseBody;
+      expect(response.status).toBe(200);
+      expect(body.itens).toHaveLength(2);
+      expect(body.pagina).toBe(1);
+      expect(body.limite).toBe(2);
+      expect(body.totalPaginas).toBe(Math.ceil(body.total / body.limite));
+    });
 
-    const listagem = await request(app.getHttpServer()).get('/api/noticias');
-    const encontrada = (listagem.body as Array<{ descricao: string }>).find(
-      (noticia) => noticia.descricao === 'Notícia sem título obrigatório',
-    );
-    expect(encontrada).toBeUndefined();
+    it('dado um termo de busca, quando GET /noticias, então filtra por titulo ou descricao', async () => {
+      // When
+      const response = await request(app.getHttpServer()).get(
+        '/api/noticias?busca=eleições',
+      );
+
+      // Then
+      const body = response.body as NoticiaPaginadaResponseBody;
+      expect(response.status).toBe(200);
+      expect(body.total).toBe(2);
+      expect(
+        body.itens.every(
+          (noticia) =>
+            noticia.titulo.toLowerCase().includes('eleições') ||
+            noticia.descricao.toLowerCase().includes('eleições'),
+        ),
+      ).toBe(true);
+    });
   });
 });
