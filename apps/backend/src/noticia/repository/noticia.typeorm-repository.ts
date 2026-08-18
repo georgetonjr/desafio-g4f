@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { Noticia } from '../noticia.entity';
 import {
+  ListarNoticiasInput,
   NoticiaInput,
+  NoticiaPaginada,
   NoticiaRepository,
 } from './noticia.repository.interface';
 
@@ -18,8 +20,31 @@ export class NoticiaTypeOrmRepository implements NoticiaRepository {
     return this.repo.save(noticia);
   }
 
-  async listarTodas(): Promise<Array<Noticia>> {
-    return this.repo.find();
+  async listar({
+    pagina,
+    limite,
+    busca,
+  }: ListarNoticiasInput): Promise<NoticiaPaginada> {
+    const query = this.repo.createQueryBuilder('noticia');
+
+    if (busca) {
+      query.where(
+        new Brackets((qb) => {
+          qb.where('noticia.titulo ILIKE :busca', {
+            busca: `%${busca}%`,
+          }).orWhere('noticia.descricao ILIKE :busca', {
+            busca: `%${busca}%`,
+          });
+        }),
+      );
+    }
+
+    const [itens, total] = await query
+      .skip((pagina - 1) * limite)
+      .take(limite)
+      .getManyAndCount();
+
+    return { itens, total };
   }
 
   async buscarPorId(id: string): Promise<Noticia | null> {
